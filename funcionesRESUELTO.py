@@ -1,6 +1,8 @@
 from principal import *
 from configuracion import *
 from funcionesSeparador import *
+import json
+from datetime import datetime
 
 import random
 import math
@@ -86,3 +88,100 @@ def procesar(candidata, silabasEnPantalla, posiciones, lemario):
 
 def randomNum(max):
     return random.random() * max
+
+def moverMenu(opciones, seleccionada, accion):
+    if seleccionada == 0 and accion == -1:
+        return len(opciones) - 1
+    elif seleccionada == len(opciones) - 1 and accion == 1:
+        return 0
+    else:
+        return seleccionada + accion
+
+def dibujarInicio(screen, opciones, opcionSeleccionada, jugador):
+    defaultFont= pygame.font.Font( pygame.font.get_default_font(), 40)
+    smallFont= pygame.font.Font( pygame.font.get_default_font(), 20)
+    yInicial = 150
+
+    screen.blit(smallFont.render("Jugador: " + jugador, 1, COLOR_TEXTO), (50, 50))
+
+    for i in range(len(opciones)):
+        posicion = (200, yInicial)
+
+        if opciones[i] == opcionSeleccionada:
+            screen.blit(defaultFont.render(opciones[i] + "*", 1, COLOR_LETRAS), posicion)
+        else:
+            screen.blit(defaultFont.render(opciones[i], 1, COLOR_TEXTO), posicion)
+
+        yInicial += 100
+
+def dibujarPuntajeJuego(screen, puntos):
+    defaultFont= pygame.font.Font( pygame.font.get_default_font(), 40)
+
+    screen.blit(defaultFont.render("PUNTAJE FINAL", 1, COLOR_TEXTO), (200, 150))
+    screen.blit(defaultFont.render(str(puntos), 1, COLOR_LETRAS), (200, 250))
+
+def dibujarIngresaNombre(screen, jugador):
+    defaultFont= pygame.font.Font( pygame.font.get_default_font(), 40)
+    smallFont= pygame.font.Font( pygame.font.get_default_font(), 20)
+
+    screen.blit(defaultFont.render("INGRESA TU NOMBRE", 1, COLOR_TEXTO), (200, 150))
+    screen.blit(defaultFont.render(jugador, 1, COLOR_LETRAS), (200, 250))
+    screen.blit(smallFont.render("Presiona enter para continuar", 1, COLOR_TEXTO), (200, 450))
+
+def procesarUsuario(jugador):
+    if jugador == "":
+        return
+
+    fileR = open("users.json", "r")
+    data = json.load(fileR)
+
+    if not jugador in data:
+        data[jugador] = []
+
+        fileW = open("users.json", "w")
+        json.dump(data, fileW, indent=2)
+        fileW.close()
+
+    fileR.close()
+
+def guardarPuntaje(jugador, puntos):
+    fileR = open("users.json", "r")
+    data = json.load(fileR)
+    
+    nuevoPuntaje = {}
+    nuevoPuntaje['score'] = puntos
+    nuevoPuntaje['date'] = datetime.now().strftime("%d/%m/%Y")
+
+    data[jugador].append(nuevoPuntaje)
+
+    fileW = open("users.json", "w")
+    json.dump(data, fileW, indent=2)
+
+    fileW.close()
+    fileR.close()
+
+def buscarMejoresPuntajes(jugador):
+    fileR = open("users.json", "r")
+    data = json.load(fileR)
+
+    return sorted(data[jugador], key=lambda x: x['score'], reverse=True)
+    fileR.close()
+
+def dibujarPuntajes(screen, jugador, puntajes):
+    defaultFont= pygame.font.Font( pygame.font.get_default_font(), 40)
+    smallFont= pygame.font.Font( pygame.font.get_default_font(), 20)
+    yInicial = 180
+
+    screen.blit(smallFont.render("Jugador: " + jugador, 1, COLOR_TEXTO), (50, 50))
+    screen.blit(smallFont.render("VOLVER*", 1, COLOR_LETRAS), (600, 50))
+
+    if len(puntajes) == 0:
+        screen.blit(defaultFont.render("No tienes puntajes", 1, COLOR_TEXTO), (200, 150))
+    else:
+        screen.blit(defaultFont.render("Mejores puntajes", 1, COLOR_TEXTO), (200, 100))
+
+    for puntaje in puntajes[:10]:
+        score = str(puntaje['score'])
+        fecha = str(puntaje['date'])
+        screen.blit(smallFont.render(score+"  -  "+fecha , 1, COLOR_TEXTO), (200, yInicial))
+        yInicial += 40

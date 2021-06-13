@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-import os, random, sys, math
+import os, random, sys, math, time
 
 import pygame
 from pygame.locals import *
@@ -23,6 +23,7 @@ def main():
     #tiempo total del juego
     gameClock = pygame.time.Clock()
     totaltime = 0
+    timer = time.time()
     segundos = TIEMPO_MAX
     fps = FPS_inicial
 
@@ -32,6 +33,16 @@ def main():
     posiciones = []
     listaDeSilabas = []
     lemario = []
+
+    pantallas = ["menu", "juego", "puntajes", "jugador"]
+    pantallaSeleccionada = "menu"
+
+    opcionesMenu = ["JUGAR", "PUNTAJES", "CAMBIAR JUGADOR", "SALIR"]
+    opcionMenuSeleccionada = 0
+
+    jugador = ""
+    nombre = ""
+    mejoresPuntajes = []
 
     lastUpgrade = 0
 
@@ -43,54 +54,118 @@ def main():
     lectura(archivo2, lemario)
     """ print(lemario) """
 
-    dibujar(screen, candidata, silabasEnPantalla, posiciones, puntos, segundos)
-
-    while segundos > fps/1000:
-        # 1 frame cada 1/fps segundos
+    while True:
         gameClock.tick(fps)
-        totaltime += gameClock.get_time()
 
-        if True:
-            fps = FPS_inicial
+        while jugador == "" or pantallaSeleccionada == "jugador":
+            gameClock.tick(fps)
+            pygame.display.flip()
+            screen.fill(COLOR_FONDO)
+            dibujarIngresaNombre(screen, nombre)
 
-        #Buscar la tecla apretada del modulo de eventos de pygame
-        for e in pygame.event.get():
-            
-            #QUIT es apretar la X en la ventana
-            if e.type == QUIT:
-                pygame.quit()
-                return()
+            for e in pygame.event.get():
+                if e.type == KEYDOWN:
+                        letra = dameLetraApretada(e.key)
+                        nombre += letra
+                        if e.key == K_BACKSPACE:
+                            nombre = nombre[0:len(nombre)-1]
+                        if e.key == K_RETURN:
+                            procesarUsuario(nombre)
+                            jugador = nombre
+                            pantallaSeleccionada = "menu"
+        
+        while pantallaSeleccionada == "puntajes":
+            gameClock.tick(fps)
+            pygame.display.flip()
+            screen.fill(COLOR_FONDO)
+            dibujarPuntajes(screen, jugador, mejoresPuntajes)
 
-            #Ver si fue apretada alguna tecla
-            if e.type == KEYDOWN:
-                letra = dameLetraApretada(e.key)
-                candidata += letra
-                if e.key == K_BACKSPACE:
-                    candidata = candidata[0:len(candidata)-1]
-                if e.key == K_RETURN:
-                    puntos += procesar(candidata, silabasEnPantalla, posiciones, lemario)
-                    candidata = ""
+            for e in pygame.event.get():
+                if e.type == KEYDOWN:
+                    letra = dameLetraApretada(e.key)
+                    if e.key == K_RETURN:
+                        pantallaSeleccionada = "menu"
 
-        segundos = TIEMPO_MAX - pygame.time.get_ticks()/1000
+        while segundos > fps/1000 and pantallaSeleccionada == "juego":
+            # 1 frame cada 1/fps segundos
+            gameClock.tick(fps)
+            totaltime += gameClock.get_time()
 
-        #Limpiar pantalla anterior
-        screen.fill(COLOR_FONDO)
+            if True:
+                fps = FPS_inicial
 
-        #Dibujar de nuevo todo
-        dibujar(screen, candidata, silabasEnPantalla, posiciones, puntos, segundos)
+            #Buscar la tecla apretada del modulo de eventos de pygame
+            for e in pygame.event.get():
+                
+                #QUIT es apretar la X en la ventana
+                if e.type == QUIT:
+                    pygame.quit()
+                    return()
 
-        pygame.display.flip()
+                #Ver si fue apretada alguna tecla
+                if e.type == KEYDOWN:
+                    letra = dameLetraApretada(e.key)
+                    candidata += letra
+                    if e.key == K_BACKSPACE:
+                        candidata = candidata[0:len(candidata)-1]
+                    if e.key == K_RETURN:
+                        puntos += procesar(candidata, silabasEnPantalla, posiciones, lemario)
+                        candidata = ""
 
-        actualizar(silabasEnPantalla, posiciones, listaDeSilabas, totaltime/1000, lastUpgrade)
+            segundos = TIEMPO_MAX - (time.time() - timer)
 
-        lastUpgrade = totaltime/1000
+            #Limpiar pantalla anterior
+            screen.fill(COLOR_FONDO)
+
+            #Dibujar de nuevo todo
+            dibujar(screen, candidata, silabasEnPantalla, posiciones, puntos, segundos)
+
+            pygame.display.flip()
+
+            actualizar(silabasEnPantalla, posiciones, listaDeSilabas, totaltime/1000, lastUpgrade)
+
+            lastUpgrade = totaltime/1000
+        
+        if segundos <= fps/1000 and pantallaSeleccionada == "juego":
+            screen.fill(COLOR_FONDO)
+            dibujarPuntajeJuego(screen, puntos)
+            guardarPuntaje(jugador, puntos)
+            pygame.display.flip()
+            time.sleep(4)
+            pantallaSeleccionada = "menu"
     
-    while 1:
+        while pantallaSeleccionada == "menu":
+            gameClock.tick(fps)
+
+            screen.fill(COLOR_FONDO)
+
+            dibujarInicio(screen, opcionesMenu, opcionesMenu[opcionMenuSeleccionada], jugador)
+            pygame.display.flip()
+
             #Esperar el QUIT del usuario
             for e in pygame.event.get():
                 if e.type == QUIT:
                     pygame.quit()
                     return
+                if e.type == KEYDOWN:
+                    if e.key == TECLA_ARRIBA:
+                        opcionMenuSeleccionada = moverMenu(opcionesMenu, opcionMenuSeleccionada, -1)
+                    if e.key == TECLA_ABAJO:
+                        opcionMenuSeleccionada = moverMenu(opcionesMenu, opcionMenuSeleccionada, 1)
+                    if e.key == K_RETURN:
+                        seleccionada = opcionesMenu[opcionMenuSeleccionada]
+                        if seleccionada == "JUGAR":
+                            timer = time.time()
+                            pantallaSeleccionada = "juego"
+                        if seleccionada == "PUNTAJES":
+                            mejoresPuntajes = buscarMejoresPuntajes(jugador)
+                            pantallaSeleccionada = "puntajes"
+                        if seleccionada == "CAMBIAR JUGADOR":
+                            nombre = ""
+                            jugador = ""
+                            pantallaSeleccionada = "jugador"
+                        if seleccionada == "SALIR":
+                            pygame.quit()
 
 #Programa Principal ejecuta Main
 if __name__ == "__main__":

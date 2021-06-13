@@ -86,16 +86,3 @@ def dibujar(screen, candidata, listaNombres, posiciones, puntos, segundos):
     screen.blit(ren1, (190, 570))
     screen.blit(ren2, (680, 10))
     screen.blit(ren3, (10, 10))
-
-def dibujarInicio(screen, opciones, opcionSeleccionada):
-    defaultFont= pygame.font.Font( pygame.font.get_default_font(), 40)
-    yInicial = 100
-
-    pygame.draw.line(screen, (255,255,255), (0, ALTO-70) , (ANCHO, ALTO-70), 5)
-
-    for i in range(len(opciones)):
-        print(opciones[i])
-        print(yInicial)
-        posicion = (100, yInicial)
-        screen.blit(defaultFont.render(opciones[i], 1, COLOR_LETRAS), posicion)
-        yInicial += 100
