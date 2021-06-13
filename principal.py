@@ -126,7 +126,7 @@ def main():
 
             lastUpgrade = totaltime/1000
         
-        if segundos <= fps/1000 and pantallaSeleccionada == "juego":
+        while segundos <= fps/1000 and pantallaSeleccionada == "juego":
             screen.fill(COLOR_FONDO)
             dibujarPuntajeJuego(screen, puntos)
             guardarPuntaje(jugador, puntos)
@@ -155,6 +155,10 @@ def main():
                     if e.key == K_RETURN:
                         seleccionada = opcionesMenu[opcionMenuSeleccionada]
                         if seleccionada == "JUGAR":
+                            silabasEnPantalla = []
+                            posiciones = []
+                            puntos = 0
+                            segundos = TIEMPO_MAX
                             timer = time.time()
                             pantallaSeleccionada = "juego"
                         if seleccionada == "PUNTAJES":
