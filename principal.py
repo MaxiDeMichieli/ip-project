@@ -122,9 +122,9 @@ def main():
 
             pygame.display.flip()
 
-            actualizar(silabasEnPantalla, posiciones, listaDeSilabas, totaltime/1000, lastUpgrade)
+            actualizar(silabasEnPantalla, posiciones, listaDeSilabas, totaltime/1500, lastUpgrade)
 
-            lastUpgrade = totaltime/1000
+            lastUpgrade = totaltime/1500
         
         while segundos <= fps/1000 and pantallaSeleccionada == "juego":
             screen.fill(COLOR_FONDO)
