@@ -12,22 +12,19 @@ def lectura(archivo, lista):
         lista.append(linea.replace("\n", "").replace("\r", ""))
 
 
-def actualizar(silabasEnPantalla, posiciones, listaDeSilabas, totalTime, lastUpgrade):
-    if totalTime > lastUpgrade:
-        """ print(totalTime, lastUpgrade) """
+def actualizar(silabasEnPantalla, posiciones, listaDeSilabas):
+    if len(posiciones) and posiciones[len(posiciones) - 1][1] > 40 or not len(posiciones):
         silaba = nuevaSilaba(listaDeSilabas)
-        posicionX = randomNum(760)
+        posicionX = randomNum(ANCHO - 40)
         silabasEnPantalla.append(silaba)
         posiciones.append((posicionX, 0))
 
     newPositions = []
-    """ print(posiciones) """
     for i in range(len(posiciones)):
         if posiciones[i][1] > 500:
             del silabasEnPantalla[i]
         else:
             newPositions.append((posiciones[i][0], posiciones[i][1]+1))
-            """ print(newPositions) """
     del posiciones[:]
     posiciones.extend(newPositions)
 
@@ -43,12 +40,9 @@ def quitar(candidata, silabasEnPantalla, posiciones):
             posicion = silabasEnPantalla.index(silaba)
             del silabasEnPantalla[posicion]
             del posiciones[posicion]
-    """ print(silabasCandidatas) """
-
 
 def dameSilabas(candidata):
     return separador(candidata).split('-')
-
 
 def esValida(candidata, silabasEnPantalla, lemario):
     silabasCandidatas = dameSilabas(candidata)
@@ -62,22 +56,17 @@ def esValida(candidata, silabasEnPantalla, lemario):
 
     return True
 
-
 def Puntos(candidata):
     total = 0
 
     for caracter in candidata:
         if caracter in VOCALES:
-            """ print(caracter, '1') """
             total += 1
         elif caracter in DIFICILES:
-            """ print(caracter, '5') """
             total += 5
         else:
-            """ print(caracter, '2') """
             total += 2
     
-    """ print(total) """
     return total
 
 def procesar(candidata, silabasEnPantalla, posiciones, lemario):

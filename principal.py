@@ -122,9 +122,7 @@ def main():
 
             pygame.display.flip()
 
-            actualizar(silabasEnPantalla, posiciones, listaDeSilabas, totaltime/1500, lastUpgrade)
-
-            lastUpgrade = totaltime/1500
+            actualizar(silabasEnPantalla, posiciones, listaDeSilabas)
         
         while segundos <= fps/1000 and pantallaSeleccionada == "juego":
             screen.fill(COLOR_FONDO)
@@ -148,9 +146,9 @@ def main():
                     pygame.quit()
                     return
                 if e.type == KEYDOWN:
-                    if e.key == TECLA_ARRIBA:
+                    if e.key in TECLA_ARRIBA:
                         opcionMenuSeleccionada = moverMenu(opcionesMenu, opcionMenuSeleccionada, -1)
-                    if e.key == TECLA_ABAJO:
+                    if e.key in TECLA_ABAJO:
                         opcionMenuSeleccionada = moverMenu(opcionesMenu, opcionMenuSeleccionada, 1)
                     if e.key == K_RETURN:
                         seleccionada = opcionesMenu[opcionMenuSeleccionada]
