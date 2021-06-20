@@ -48,51 +48,55 @@ def main():
 
     archivo= open("silabas.txt","r")
     lectura(archivo, listaDeSilabas)
-    """ print(listaDeSilabas) """
 
     archivo2= open("lemario.txt","r")
     lectura(archivo2, lemario)
-    """ print(lemario) """
 
     while True:
         gameClock.tick(fps)
 
+        # Pantalla de "seleccionar un jugador"
         while jugador == "" or pantallaSeleccionada == "jugador":
             gameClock.tick(fps)
             pygame.display.flip()
             screen.fill(COLOR_FONDO)
+
+            # Dibuja la pantalla
             dibujarIngresaNombre(screen, nombre)
 
+            # Escucha eventos de teclado
             for e in pygame.event.get():
                 if e.type == KEYDOWN:
-                        letra = dameLetraApretada(e.key)
-                        nombre += letra
-                        if e.key == K_BACKSPACE:
-                            nombre = nombre[0:len(nombre)-1]
-                        if e.key == K_RETURN:
-                            procesarUsuario(nombre)
-                            jugador = nombre
-                            pantallaSeleccionada = "menu"
+                    letra = dameLetraApretada(e.key)
+                    nombre += letra
+                    if e.key == K_BACKSPACE:
+                        nombre = nombre[0:len(nombre)-1]
+                    if e.key == K_RETURN:
+                        procesarUsuario(nombre)
+                        jugador = nombre
+                        pantallaSeleccionada = "menu"
         
+        # Pantalla de "mejores puntajes"
         while pantallaSeleccionada == "puntajes":
             gameClock.tick(fps)
             pygame.display.flip()
             screen.fill(COLOR_FONDO)
+
+            # Dibuja la pantalla
             dibujarPuntajes(screen, jugador, mejoresPuntajes)
 
+            # Escucha eventos de teclado
             for e in pygame.event.get():
                 if e.type == KEYDOWN:
                     letra = dameLetraApretada(e.key)
                     if e.key == K_RETURN:
                         pantallaSeleccionada = "menu"
 
+        # Pantalla de "juego"
         while segundos > fps/1000 and pantallaSeleccionada == "juego":
             # 1 frame cada 1/fps segundos
             gameClock.tick(fps)
             totaltime += gameClock.get_time()
-
-            if True:
-                fps = FPS_inicial
 
             #Buscar la tecla apretada del modulo de eventos de pygame
             for e in pygame.event.get():
@@ -124,23 +128,27 @@ def main():
 
             actualizar(silabasEnPantalla, posiciones, listaDeSilabas)
         
+        # Pantalla de "puntajes" despues de juego
         while segundos <= fps/1000 and pantallaSeleccionada == "juego":
             screen.fill(COLOR_FONDO)
+            # Dibuja la pantalla
             dibujarPuntajeJuego(screen, puntos)
             guardarPuntaje(jugador, puntos)
             pygame.display.flip()
             time.sleep(4)
             pantallaSeleccionada = "menu"
     
+        # Pantalla de "menu"
         while pantallaSeleccionada == "menu":
             gameClock.tick(fps)
 
             screen.fill(COLOR_FONDO)
 
+            # Dibuja la pantalla
             dibujarInicio(screen, opcionesMenu, opcionesMenu[opcionMenuSeleccionada], jugador)
             pygame.display.flip()
 
-            #Esperar el QUIT del usuario
+            # Escucha eventos de teclado
             for e in pygame.event.get():
                 if e.type == QUIT:
                     pygame.quit()
@@ -156,6 +164,7 @@ def main():
                             silabasEnPantalla = []
                             posiciones = []
                             puntos = 0
+                            candidata = ""
                             segundos = TIEMPO_MAX
                             timer = time.time()
                             pantallaSeleccionada = "juego"
