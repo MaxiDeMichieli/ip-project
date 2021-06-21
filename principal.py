@@ -20,6 +20,11 @@ def main():
     pygame.display.set_caption("Rapido...")
     screen = pygame.display.set_mode((ANCHO, ALTO))
 
+    # carga musica
+    pygame.mixer.music.load("musica/impossible.mid")
+    pygame.mixer.music.play()
+    pygame.mixer.music.set_volume(0.2)
+
     #tiempo total del juego
     gameClock = pygame.time.Clock()
     totaltime = 0
